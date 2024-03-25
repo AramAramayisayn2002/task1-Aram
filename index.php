@@ -1,7 +1,7 @@
 <?php
 require_once('configs/config.php');
-require_once('libreries/Controller.php');
-require_once('libreries/Database.php');
+require_once('libraries/Controller.php');
+require_once('libraries/Database.php');
 session_start();
 class Route
 {

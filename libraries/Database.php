@@ -7,12 +7,16 @@ class Database
     public $queryResultat;
     protected function __construct()
     {
-        $this->connect = new mysqli(SERVER_HOST, SERVER_USERNAME, SERVER_PASSWORD, DB_NAME);
-        if ($this->connect->connect_errno) {
-            echo "error " . $this->connect->connect_error;
+        try {
+            $dsn = "mysql:host=" . SERVER_HOST . ";dbname=" . DB_NAME;
+            $this->pdo = new PDO($dsn, SERVER_USERNAME, SERVER_PASSWORD);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "Connection failed: " . $e->getMessage();
             exit();
         }
     }
+
     public function numRows()
     {
         if ($this->queryResultat) {
@@ -29,17 +33,24 @@ class Database
     }
     public function insert($post)
     {
-        $name = $_POST['name'];
-        $surname = $_POST['surname'];
-        $gender = $_POST['gender'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $name = $post['name'];
+        $surname = $post['surname'];
+        $gender = $post['gender'];
+        $email = $post['email'];
+        $password = $post['password'];
         $this->query = "INSERT INTO users (name, surname, gender, email, password) VALUES ('$name', '$surname', '$gender', '$email', '$password')";
         return $this;
     }
+
     public function execute()
     {
-        $this->queryResultat = mysqli_query($this->connect, $this->query);
-        return $this;
+        try {
+            $statement = $this->pdo->prepare($this->query);
+            $statement->execute();
+            $this->queryResultat = $statement->fetchAll(PDO::FETCH_ASSOC);
+            return $this;
+        } catch (PDOException $e) {
+            die("Error executing query: " . $e->getMessage());
+        }
     }
 }
