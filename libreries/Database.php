@@ -2,7 +2,7 @@
 class Database
 {
     public $tableName;
-    public $connect = '';
+    public $connect;
     public $query;
     public $queryResultat;
     protected function __construct()
